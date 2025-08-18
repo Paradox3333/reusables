@@ -1,0 +1,27 @@
+name: 'Check Critical Paths Changed'
+description: |
+  Composite action to determine if any files with patterns in build_triggers.yml have changed.
+  Outputs a boolean to drive downstream conditional workflows (e.g., Docker build).
+
+outputs:
+  changed:
+    description: 'true if any monitored paths changed'
+    value: ${{ steps.filter.outputs.docker_context }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Full history.
+    - name: Filter Paths
+      id: filter
+      uses: dorny/paths-filter@v3
+      with:
+        filters: build_triggers.yml
+    - name: Output
+      shell: bash
+      run: |
+        echo "Filtering result for group 'docker_context': ${{ steps.filter.outputs.docker_context }}"
+        echo "changed=${{ steps.filter.outputs.docker_context }}" >> $GITHUB_OUTPUT

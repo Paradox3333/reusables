@@ -1,0 +1,37 @@
+name: Docker CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-diff:
+    name: Check if Docker context has changed
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.diff.outputs.changed }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run gate diff checker
+        uses: ./.github/actions/bool_diff
+        id: diff
+
+  ghcr-build-push:
+    name: Build and push Docker image
+    permissions:
+      contents: read
+      packages: write
+    needs: check-diff
+    if: needs.check-diff.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ghcr_build_push
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          image_name: test
+          image_tag: latest
+          context: .

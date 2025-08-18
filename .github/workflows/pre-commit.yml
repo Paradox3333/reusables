@@ -1,0 +1,30 @@
+name: Pre-commit checks
+
+on:
+  pull_request:
+    branches:
+      - main
+      - meta/workflows
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+      - name: Install pipx
+        run: |
+          sudo apt update
+          sudo apt install -y pipx
+          pipx ensurepath
+      - name: Install Poetry
+        run: |
+          pipx install poetry==2.0.0
+      - name: Install dependencies
+        run: poetry install --with dev
+      - name: Run pre-commit hooks
+        run: poetry run pre-commit run --all-files

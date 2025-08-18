@@ -1,0 +1,108 @@
+name: Check Line Counts
+
+on:
+    pull_request:
+      branches:
+        - main
+        - meta/workflows
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  checkbranch:
+    name: Check PR Branch status
+    runs-on: ubuntu-latest
+
+    outputs:
+      branchstat: ${{ steps.brstat.outputs.stat}}
+
+    steps:
+      - name: Check code from PR branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Check whether branch is up-to-date
+        id: brstat
+        run: |
+          git remote add ddf https://github.com/bosch-dcih-datalab/delayed-delivery-forecasting
+          git fetch ddf main
+          echo "${{ github.event.pull_request.head.sha }}"
+          git rev-list --left-right --count  ddf/main...${{ github.event.pull_request.head.sha }} | awk '{print "Behind "$1" - Ahead "$2""}'
+          count=$(git rev-list --left-right --count  ddf/main...${{ github.event.pull_request.head.sha }} | awk '{print $1}')
+          if [ $count -gt 0 ]
+          then
+            echo "Current branch is behind ddf main branch."
+            echo "stat=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "stat=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  szdiff:
+    name: Core Library Line Difference
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    needs: checkbranch
+    if: needs.checkbranch.outputs.branchstat == 'false'
+
+    steps:
+      - name: Checkout code from PR branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+      - name: Checkout code from ddf main
+        uses: actions/checkout@v4
+        with:
+          repository: bosch-dcih-datalab/delayed-delivery-forecasting
+          ref: main
+          fetch-depth: 0
+          path: base
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Count Line Diff
+        run: |
+          pip install tabulate
+          BASE="$GITHUB_WORKSPACE/base"
+          PR="$GITHUB_WORKSPACE/pr"
+          echo ">>> BASE directory: $BASE"
+          echo ">>> PR  directory: $PR"
+          cp "$PR/size_diff.py" .
+          echo "loc_content<<EOF" >> "$GITHUB_ENV"
+          python size_diff.py "$BASE" "$PR" >> "$GITHUB_ENV"
+          echo "EOF" >> "$GITHUB_ENV"
+      - name: Comment Code Line Diff
+        continue-on-error: false
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ignore_empty: true
+          skip_unchanged: true
+          recreate: true
+          message: ${{ env.loc_content }}
+
+  rebase:
+    name: Core Library Line Difference
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    needs: checkbranch
+    if: needs.checkbranch.outputs.branchstat == 'true'
+    steps:
+      - name: Comment Rebase/Merge
+        continue-on-error: false
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          skip_unchanged: true
+          recreate: true
+          message: |
+            This branch is currently behind ddf/main. Auto line count diff disabled.
