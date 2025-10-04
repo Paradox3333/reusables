@@ -4,3 +4,4 @@ docker_context:
   - 'config/**'
   - 'pyproject.toml'
   - 'uv.lock'
+  - './'
