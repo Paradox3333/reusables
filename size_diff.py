@@ -1,8 +1,4 @@
-"""
-size_diff.py
-
-Script to analyze the size of Python files.
-"""
+# inspired by https://github.com/tinygrad/tinygrad/blob/master/sz.py
 
 #####################################################################################################################################
 #                                                           Module Setup                                                            #

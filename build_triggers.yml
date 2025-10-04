@@ -1,7 +1,6 @@
 # File with the filters used by dorny.
 
 docker_context:
-  - 'src/**'
   - 'config/**'
   - 'pyproject.toml'
-  - 'poetry.lock'
+  - 'uv.lock'
