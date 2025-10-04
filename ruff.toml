@@ -3,14 +3,19 @@
 # General settings
 indent-width = 4  # Spaces
 preview = true
-target-version = "py310"
+target-version = "py311"
 line-length = 150
 
 exclude = [
-  "data/",
-  "dependencies/",
-  "docs/",
-  "notebooks/",
+  ".pytest_cache",
+  ".vscode",
+  ".venv",
+  ".mypy_cache",
+  "data",
+  "dependencies",
+  "docs",
+  "notebooks",
+  "build",
 ]
 
 # Linting configuration
