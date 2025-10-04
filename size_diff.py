@@ -1,4 +1,4 @@
-# inspired by https://github.com/tinygrad/tinygrad/blob/master/sz.py
+# inspired by https://github.com/tinygrad/tinygrad/blob/master/sz.py 
 
 #####################################################################################################################################
 #                                                           Module Setup                                                            #
