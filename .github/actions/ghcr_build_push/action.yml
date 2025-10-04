@@ -55,7 +55,7 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.context }}/${{ inputs.dockerfile_name }}
         push: true
-        tags: ghcr.io/bosch-dcih-datalab/delayed-delivery-forecasting/${{ inputs.image_name }}:${{ inputs.image_tag }}
+        tags: ghcr.io/Paradox3333/reusables/${{ inputs.image_name }}:${{ inputs.image_tag }}
     - id: success
       shell: bash
       run: echo "success=true" >> $GITHUB_OUTPUT
