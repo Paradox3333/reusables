@@ -28,7 +28,7 @@ jobs:
       - name: Check whether branch is up-to-date
         id: brstat
         run: |
-          git remote add ddf https://github.com/bosch-dcih-datalab/delayed-delivery-forecasting
+          git remote add ddf https://github.com/Paradox3333/reusables
           git fetch ddf main
           echo "${{ github.event.pull_request.head.sha }}"
           git rev-list --left-right --count  ddf/main...${{ github.event.pull_request.head.sha }} | awk '{print "Behind "$1" - Ahead "$2""}'
@@ -60,7 +60,7 @@ jobs:
       - name: Checkout code from ddf main
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/Paradox3333/reusables.git
+          repository: ${{ github.repository }}
           ref: main
           fetch-depth: 0
           path: base
