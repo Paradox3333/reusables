@@ -28,14 +28,14 @@ jobs:
       - name: Check whether branch is up-to-date
         id: brstat
         run: |
-          git remote add ddf https://github.com/Paradox3333/reusables
-          git fetch ddf main
+          git remote add repo https://github.com/${{ github.repository }}
+          git fetch repo main
           echo "${{ github.event.pull_request.head.sha }}"
-          git rev-list --left-right --count  ddf/main...${{ github.event.pull_request.head.sha }} | awk '{print "Behind "$1" - Ahead "$2""}'
-          count=$(git rev-list --left-right --count  ddf/main...${{ github.event.pull_request.head.sha }} | awk '{print $1}')
+          git rev-list --left-right --count  repo/main...${{ github.event.pull_request.head.sha }} | awk '{print "Behind "$1" - Ahead "$2""}'
+          count=$(git rev-list --left-right --count  repo/main...${{ github.event.pull_request.head.sha }} | awk '{print $1}')
           if [ $count -gt 0 ]
           then
-            echo "Current branch is behind ddf main branch."
+            echo "Current branch is behind main branch."
             echo "stat=true" >> "$GITHUB_OUTPUT"
           else
             echo "stat=false" >> "$GITHUB_OUTPUT"
