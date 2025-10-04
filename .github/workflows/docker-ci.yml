@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - meta/workflows
 
 jobs:
   check-diff:

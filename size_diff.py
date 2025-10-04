@@ -1,7 +1,7 @@
 """Tool to monitor LoC differences"""
 
 
-# inspired by https://github.com/tinygrad/tinygrad/blob/master/sz.py
+# Inspired by https://github.com/tinygrad/tinygrad/blob/master/sz.py
 
 #####################################################################################################################################
 #                                                           Module Setup                                                            #
