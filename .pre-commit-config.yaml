@@ -22,7 +22,7 @@ repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.9.6
   hooks:
-    - id: ruff
+    - id: ruff-check
       args: ["--fix"]
       always_run: true
       types: [python]
